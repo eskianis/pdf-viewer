@@ -35,6 +35,8 @@ go test -run TestClassifyHandler ./handlers  # Run single test
 | `ANTHROPIC_API_KEY` | Yes | - | Claude API access key |
 | `PORT` | No | `8080` | Backend server port |
 | `CORS_ORIGIN` | No | `http://localhost:3000` | Allowed CORS origin for frontend |
+| `STORAGE_TYPE` | No | `memory` | Storage backend: `memory` or `sqlite` |
+| `SQLITE_PATH` | No | `./pdfviewer.db` | SQLite database file path (when STORAGE_TYPE=sqlite) |
 | `NEXT_PUBLIC_API_URL` | No | `http://localhost:8080` | Frontend API URL |
 
 ## Architecture
@@ -44,7 +46,7 @@ Frontend (Next.js :3000) <--REST API--> Backend (Go :8080)
                                               ↓
                                     Claude AI (Classification/Extraction)
                                               ↓
-                                    Store (pluggable, currently in-memory)
+                                    Store (memory or SQLite via STORAGE_TYPE)
 ```
 
 **Three-Step Workflow:**
@@ -56,7 +58,7 @@ Frontend (Next.js :3000) <--REST API--> Backend (Go :8080)
 - `agents/` - Claude SDK wrapper with classification and extraction logic
 - `agents/schemas.go` - JSON schemas for each document type (invoice, contract, resume, etc.)
 - `handlers/` - HTTP request handlers for each endpoint
-- `store/` - Pluggable storage interface (currently in-memory implementation)
+- `store/` - Pluggable storage interface with in-memory and SQLite implementations
 - `models/document.go` - Core data structures, token usage tracking, cost calculation
 - `middleware/` - CORS (configurable via `CORS_ORIGIN`) and request logging
 
@@ -113,7 +115,7 @@ docker run -p 8080:8080 -e ANTHROPIC_API_KEY=your-key -e CORS_ORIGIN=http://loca
 
 ## Notes
 
-- Storage is in-memory only - data is lost on server restart
+- Storage defaults to in-memory (data lost on restart). Set `STORAGE_TYPE=sqlite` for persistence
 - All Claude interactions are logged in prompt history for debugging
 - Path alias `@/*` maps to `./src/*` in frontend
 - PDF highlighting uses multi-strategy text matching for split spans
