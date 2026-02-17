@@ -1,0 +1,23 @@
+# Environment files
+.env
+*.env
+
+# Build artifacts
+backend/server
+backend/coverage.out
+
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Playwright
+.playwright-mcp/
+
+# Screenshots
+*.png
