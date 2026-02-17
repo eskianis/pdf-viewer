@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { PromptRecord } from '@/types/api';
 
 interface PromptInspectorProps {
@@ -44,6 +44,20 @@ export function PromptInspector({ prompts, isOpen, onClose }: PromptInspectorPro
     prompts[0]?.id || null
   );
   const [activeTab, setActiveTab] = useState<'prompt' | 'response' | 'schema'>('prompt');
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Calculate totals
   const totals = useMemo(() => {
